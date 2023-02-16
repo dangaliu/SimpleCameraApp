@@ -6,6 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".view.MainActivity">
 
+    <View
+        android:id="@+id/viewGoToGalleryBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/previewView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_weight="1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGoToGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="Перейти в галерею"
+        android:textColor="@color/black"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/viewGoToGalleryBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/viewGoToGalleryBackground" />
+
+
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="0dp"
@@ -13,9 +39,8 @@
         app:layout_constraintBottom_toTopOf="@id/buttonsBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintVertical_weight="3" />
+        app:layout_constraintTop_toBottomOf="@id/viewGoToGalleryBackground"
+        app:layout_constraintVertical_weight="5" />
 
     <View
         android:id="@+id/buttonsBackground"
@@ -36,6 +61,7 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="32dp"
+        android:contentDescription="Take Photo"
         app:layout_constraintBottom_toBottomOf="@id/buttonsBackground"
         app:layout_constraintEnd_toStartOf="@id/cvCaptureVideo"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -59,6 +85,7 @@
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="32dp"
+        android:contentDescription="Capture Video"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/cvTakePhoto"

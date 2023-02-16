@@ -2,6 +2,7 @@ package com.example.simplecameraapp.view
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -80,6 +81,10 @@ class MainActivity : AppCompatActivity() {
     private fun setListeners() {
         binding.cvTakePhoto.setOnClickListener {
             takePhoto()
+        }
+
+        binding.btnGoToGallery.setOnClickListener {
+            startActivity(Intent(this, PhotoListActivity::class.java))
         }
     }
 
