@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewGoToGalleryBackground"
-        app:layout_constraintVertical_weight="5" />
+        app:layout_constraintVertical_weight="8" />
 
     <View
         android:id="@+id/buttonsBackground"
@@ -51,7 +51,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/previewView"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintVertical_weight="2" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvTakePhoto"
