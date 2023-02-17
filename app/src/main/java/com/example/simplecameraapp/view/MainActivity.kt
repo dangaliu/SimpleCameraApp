@@ -3,6 +3,7 @@ package com.example.simplecameraapp.view
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -14,6 +15,9 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.FileOutputOptions
+import androidx.camera.video.Recorder
+import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.example.simplecameraapp.databinding.ActivityMainBinding
@@ -30,10 +34,10 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
-
     private lateinit var imageCapture: ImageCapture
-
     private lateinit var cameraExecutor: Executor
+    private lateinit var videoCapture: VideoCapture<Recorder>
+
 
     private var requestAppPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -109,11 +113,38 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun captureVideo() {
+        val contextWrapper = ContextWrapper(this)
+        val videosDir: File = contextWrapper.getDir("videosDir", Context.MODE_PRIVATE)
+        val fileName = "VIDEO_${System.currentTimeMillis()}"
+        val file = File(videosDir, fileName)
+
+        val fileOutputOptions = FileOutputOptions.Builder(file).build()
+        val recording = videoCapture.output
+            .prepareRecording(this, fileOutputOptions)
+            .apply {
+                if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    withAudioEnabled()
+                }
+            }
+            .start(ContextCompat.getMainExecutor(this)) {}
+    }
+
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
         val preview: Preview = Preview.Builder().build()
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
         preview.setSurfaceProvider(binding.previewView.surfaceProvider)
         cameraProvider.unbindAll()
-        val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+
+        val recorder = Recorder.Builder().build()
+        videoCapture = VideoCapture.withOutput(recorder)
+
+        val camera = cameraProvider.bindToLifecycle(
+            this,
+            cameraSelector,
+            preview,
+            imageCapture,
+            videoCapture
+        )
     }
 }
