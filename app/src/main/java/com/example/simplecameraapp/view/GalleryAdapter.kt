@@ -1,6 +1,7 @@
 package com.example.simplecameraapp.view
 
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +13,13 @@ import com.bumptech.glide.Glide
 import com.example.simplecameraapp.R
 import com.example.simplecameraapp.model.dto.GalleryItem
 import com.example.simplecameraapp.model.dto.GalleryItemType
+import java.io.File
 
 class GalleryAdapter(
     private val context: Context,
-    private val galleryItems: List<GalleryItem>
+    private val galleryItems: List<GalleryItem>,
+    private val onImageClick: (Uri) -> Unit = {},
+    private val onVideoClick: (Uri) -> Unit = {}
 ) : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
 
     companion object {
@@ -51,9 +55,16 @@ class GalleryAdapter(
         val galleryItem = galleryItems[position]
         when (holder) {
             is GalleryViewHolder.GalleryImageViewHolder -> {
+                holder.ivImage.setOnClickListener {
+                    onImageClick(galleryItem.fileUri)
+                }
                 Glide.with(context).load(galleryItem.fileUri).into(holder.ivImage)
             }
-            is GalleryViewHolder.GalleryVideoViewHolder -> {}
+            is GalleryViewHolder.GalleryVideoViewHolder -> {
+                holder.ivImage.setOnClickListener {
+                    onVideoClick(galleryItem.fileUri)
+                }
+            }
         }
     }
 

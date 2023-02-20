@@ -17,9 +17,12 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.example.simplecameraapp.R
 import com.example.simplecameraapp.databinding.ActivityMainBinding
 import com.example.simplecameraapp.viewmodel.MainViewModel
 import com.google.common.util.concurrent.ListenableFuture
@@ -36,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: Executor
+    private var recording: Recording? = null
     private lateinit var videoCapture: VideoCapture<Recorder>
 
 
@@ -88,7 +92,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnGoToGallery.setOnClickListener {
-            startActivity(Intent(this, PhotoListActivity::class.java))
+            startActivity(Intent(this, GalleryActivity::class.java))
+        }
+
+        binding.cvCaptureVideo.setOnClickListener {
+            captureVideo()
         }
     }
 
@@ -119,15 +127,37 @@ class MainActivity : AppCompatActivity() {
         val fileName = "VIDEO_${System.currentTimeMillis()}"
         val file = File(videosDir, fileName)
 
+        val curRecording = recording
+        if (curRecording != null) {
+            curRecording.stop()
+            recording = null
+            return
+        }
+
         val fileOutputOptions = FileOutputOptions.Builder(file).build()
-        val recording = videoCapture.output
+        recording = videoCapture.output
             .prepareRecording(this, fileOutputOptions)
             .apply {
                 if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                     withAudioEnabled()
                 }
             }
-            .start(ContextCompat.getMainExecutor(this)) {}
+            .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
+                when (recordEvent) {
+                    is VideoRecordEvent.Start -> {
+                        binding.ivCaptureVideo.setImageResource(R.drawable.stop)
+                    }
+                    is VideoRecordEvent.Finalize -> {
+                        binding.ivCaptureVideo.setImageResource(R.drawable.play)
+                        if (!recordEvent.hasError()) {
+                            Toast.makeText(this, "Видео сохранено в ${recordEvent.outputResults.outputUri}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Ошибка ${recordEvent.error}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+            }
     }
 
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
@@ -138,6 +168,8 @@ class MainActivity : AppCompatActivity() {
 
         val recorder = Recorder.Builder().build()
         videoCapture = VideoCapture.withOutput(recorder)
+
+        cameraProvider.unbindAll()
 
         val camera = cameraProvider.bindToLifecycle(
             this,

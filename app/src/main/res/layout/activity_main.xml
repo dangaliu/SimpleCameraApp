@@ -69,6 +69,7 @@
         app:layout_constraintTop_toTopOf="@id/buttonsBackground">
 
         <ImageView
+            android:id="@+id/ivTakePhoto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="16dp"
@@ -92,6 +93,7 @@
         app:layout_constraintTop_toTopOf="@id/buttonsBackground">
 
         <ImageView
+            android:id="@+id/ivCaptureVideo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="16dp"
